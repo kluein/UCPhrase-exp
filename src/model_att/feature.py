@@ -68,6 +68,7 @@ class FeatureExtractor(BaseFeatureExtractor):
             swidx2widx = {swidx: widx for widx, swidx in enumerate(word_idxs)}
             swidx2widx.update({len(marked_sent['ids']): len(swidx2widx)})
 
+            # Positive spans
             for l_idx, r_idx in marked_sent['pos_spans']:
                 wl_idx, wr_idx = swidx2widx[l_idx], swidx2widx[r_idx + 1] - 1
                 spanlen = wr_idx - wl_idx + 1
@@ -79,6 +80,7 @@ class FeatureExtractor(BaseFeatureExtractor):
                 positive_instance = (1, spanlen, positive_span_attentionmap, marked_sent['ids'][l_idx: r_idx + 1])
                 train_instances.append(positive_instance)
 
+            # Negative spans
             for negative_l_idx, negative_r_idx in marked_sent['neg_spans']:
                 negative_wl_idx, negative_wr_idx = swidx2widx[negative_l_idx], swidx2widx[negative_r_idx + 1] - 1
                 negative_spanlen = negative_wr_idx - negative_wl_idx + 1

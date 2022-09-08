@@ -53,10 +53,13 @@ class Experiment:
             )
         }[self.config['annotator']]
 
+        print("train annotator", type(self.train_annotator))
+
         # model
         model_prefix = '.' + ARGS.model_prefix if ARGS.model_prefix else ''
         model_dir = self.dir_exp / f'model{model_prefix}'
         if self.config['model'] == 'CNN':
+            print(f"Using ATT model - {self.config['num_lm_layers']} layers")
             model = model_att.AttmapModel(
                 model_dir=model_dir,
                 max_num_subwords=consts.MAX_SUBWORD_GRAM,
@@ -64,6 +67,7 @@ class Experiment:
             self.trainer = model_att.AttmapTrainer(
                 model=model)
         elif self.config['model'] == 'emb':
+            print(f"Using EMB model")
             model = model_emb.EmbedModel(
                 model_dir=model_dir,
                 finetune=self.config['finetune']
@@ -74,7 +78,9 @@ class Experiment:
 
     def train(self, num_epochs=20):
         self.train_preprocessor.tokenize_corpus()
+        # This mark_corpus function is from anotator_base
         self.train_annotator.mark_corpus()
+        # Sample train data
         path_sampled_train_data = self.train_annotator.sample_train_data()
         self.trainer.train(path_sampled_train_data=path_sampled_train_data, num_epochs=num_epochs)
 
